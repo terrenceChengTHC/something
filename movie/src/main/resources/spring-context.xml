@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    
+    <description>Spring MVC Configuration</description>
+    
+	<!-- 使用Annotation自动注册Bean,只扫描@Controller -->
+	<context:component-scan base-package="com.msyd.wireless.web.controller" use-default-filters="false"><!-- base-package 如果多个，用“,”分隔 -->
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
+	<mvc:resources mapping="/view/**" location="/view/"/>
+	<mvc:resources mapping="/view/css/**" location="/view/css/"/>
+	<mvc:resources mapping="/view/images/**" location="/view/images/"/>
+	<mvc:resources mapping="/view/js/**" location="/view/js/"/>
+	<mvc:resources mapping="/view/common/**" location="/view/common/"/>
+	<mvc:resources mapping="/view/page/**" location="/view/page/"/>
+	
+	
+	<!-- 定义视图文件解析 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+			<bean class="com.msyd.wireless.web.interceptor.SessionManageInterceptor">
+			</bean>
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+			<bean class="com.msyd.wireless.web.interceptor.XSSSafeInterceptor"/>
+		</mvc:interceptor>
+	</mvc:interceptors>
+	 <!-- 会自动注册了validator  ConversionService  -->
+    <mvc:annotation-driven validator="validator" conversion-service="conversion-service"/>
+    
+	<!-- properties加载 -->
+    <bean id="configProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath*:*.properties</value>
+            </list>
+        </property>
+    </bean>    
+	<!-- spring变量替换 -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+        <property name="properties" ref="configProperties"/>
+    </bean>
+    
+    <!-- 以下 validator  ConversionService 在使用 mvc:annotation-driven 会 自动注册-->
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <property name="providerClass"  value="org.hibernate.validator.HibernateValidator"/>
+    </bean>
+    <bean id="conversion-service" class="org.springframework.format.support.FormattingConversionServiceFactoryBean"  />
+     <!-- 异常处理 -->
+	<bean id="exceptionHandler" class="com.msyd.wireless.web.interceptor.ExceptionHandler"/>
+	
+	<bean id="applicationContextTool" class="com.msyd.base.util.ApplicationContextTool" />
+	
+	<import resource="spring-context-consumer-config.xml"/>
+	<import resource="spring-context-consumer-account.xml"/>
+	<import resource="spring-context-consumer-assets.xml"/>
+	<import resource="spring-context-consumer-deal.xml"/>
+	<import resource="spring-context-consumer-passport.xml"/>
+	<import resource="spring-context-consumer-thirdPayment.xml"/>
+</beans>
