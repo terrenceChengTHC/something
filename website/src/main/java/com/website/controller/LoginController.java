@@ -1,5 +1,4 @@
-package com.movie.controller;
+package com.website.controller;
 
 public class LoginController {
-
 }

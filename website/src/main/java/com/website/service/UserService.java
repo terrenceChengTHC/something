@@ -1,4 +1,4 @@
-package com.movie.service;
+package com.website.service;
 
 public class UserService {
 

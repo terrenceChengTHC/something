@@ -1,4 +1,4 @@
-package com.movie.dao;
+package com.website.dao;
 
 public class UserDao {
 
